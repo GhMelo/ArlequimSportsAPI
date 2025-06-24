@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35919.96 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArlequimSportsAPI", "ArlequimSportsAPI\ArlequimSportsAPI.csproj", "{E89C7B6E-01DC-4B6B-82A8-C2FF437C2C65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{CE258450-FB71-426F-B695-81D82F9E9E2E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E89C7B6E-01DC-4B6B-82A8-C2FF437C2C65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E89C7B6E-01DC-4B6B-82A8-C2FF437C2C65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E89C7B6E-01DC-4B6B-82A8-C2FF437C2C65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E89C7B6E-01DC-4B6B-82A8-C2FF437C2C65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE258450-FB71-426F-B695-81D82F9E9E2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE258450-FB71-426F-B695-81D82F9E9E2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE258450-FB71-426F-B695-81D82F9E9E2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE258450-FB71-426F-B695-81D82F9E9E2E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EE70EB5E-5579-411F-BB9D-30BAE826F7FA}
+	EndGlobalSection
+EndGlobal
