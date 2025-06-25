@@ -1,6 +1,6 @@
 ﻿namespace Application.DTOs
 {
-    internal class ProdutoDto
+    public class ProdutoDto
     {
         public string Nome { get; set; } = null!;
         public string Descricao { get; set; } = null!;

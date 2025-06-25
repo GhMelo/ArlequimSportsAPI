@@ -1,4 +1,5 @@
-﻿using Application.Inputs.StatusPedidoInput;
+﻿using Application.DTOs;
+using Application.Inputs.StatusPedidoInput;
 
 namespace Application.Interfaces.IService
 {

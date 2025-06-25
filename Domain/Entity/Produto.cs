@@ -7,4 +7,6 @@ public class Produto : EntityBase
     public double Preco { get; set; }
     public int EsporteModalidadeId { get; set; }
     public virtual EsporteModalidade EsporteModalidade  { get; set; }
+    public virtual ICollection<ProdutoEstoque> ProdutoEstoque { get; set; }
+    public virtual ICollection<PedidoProduto> PedidoProduto { get; set; }
 }
