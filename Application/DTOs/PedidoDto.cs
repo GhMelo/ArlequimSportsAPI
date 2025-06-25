@@ -7,6 +7,6 @@
         public string EmailCliente { get; set; }
         public UsuarioDto Vendedor { get; set; } = null!;
         public StatusPedidoDto StatusPedido { get; set; } = null!;
-        public ICollection<ProdutoPedidoDto> produtoPedido { get; set; } = null!;
+        public ICollection<PedidoProdutoDto> produtoPedido { get; set; } = null!;
     }
 }

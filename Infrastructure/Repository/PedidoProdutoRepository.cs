@@ -7,6 +7,10 @@ namespace Infrastructure.Repository
     {
         public PedidoProdutoRepository(ApplicationDbContext context) : base(context)
         {
+
         }
+
+        public IEnumerable<PedidoProduto> obterTodosPorPedidoId(int id)
+            => _dbSet.Where(entity => entity.Id == id);
     }
 }

@@ -4,6 +4,7 @@ namespace Application.Inputs.PedidoInput
 {
     public class PedidoAlteracaoInput
     {
+        public int PedidoId { get; set; }
         public string DocumentoCliente { get; set; }
         public string EmailCliente { get; set; }
         public int VendedorId { get; set; }

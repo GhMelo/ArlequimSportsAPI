@@ -1,4 +1,5 @@
-﻿using Application.Inputs.EsporteModalidadeInput;
+﻿using Application.DTOs;
+using Application.Inputs.EsporteModalidadeInput;
 
 namespace Application.Interfaces.IService
 {

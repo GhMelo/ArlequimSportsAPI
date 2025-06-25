@@ -14,6 +14,7 @@ namespace Infrastructure.Repository.Configurations
             builder.Property(pp => pp.Id).HasColumnType("INT");
             builder.Property(pp => pp.PedidoId).HasColumnType("INT").IsRequired();
             builder.Property(pp => pp.ProdutoId).HasColumnType("INT").IsRequired();
+            builder.Property(pp => pp.ProdutoEstoqueId).HasColumnType("INT").IsRequired();
             builder.Property(pp => pp.Quantidade).HasColumnType("INT").IsRequired();
 
             builder.HasOne(pp => pp.Pedido)
@@ -23,6 +24,10 @@ namespace Infrastructure.Repository.Configurations
             builder.HasOne(pp => pp.Produto)
                 .WithMany()
                 .HasForeignKey(pp => pp.ProdutoId);
+
+            builder.HasOne(pp => pp.Produto)
+                .WithMany()
+                .HasForeignKey(pp => pp.ProdutoEstoqueId);
         }
     }
 }
