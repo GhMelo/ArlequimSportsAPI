@@ -10,5 +10,9 @@
         public virtual ProdutoEstoque ProdutoEstoque { get; set; } = null!;
         public virtual TipoOperacao TipoOperacao { get; set; } = null!;
         public virtual Usuario Usuario { get; set; } = null!;
+        public ProdutoEstoqueMovimentacao()
+        {
+            DataMovimentacao = DateTime.Now;
+        }
     }
 }

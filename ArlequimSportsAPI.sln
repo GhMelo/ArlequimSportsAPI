@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArlequimSportsAPI", "Arlequ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{CE258450-FB71-426F-B695-81D82F9E9E2E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{8741B2C1-4D6E-4A86-A7E3-6DDE53DBC884}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{80D34137-D1C9-4646-8555-A34D88C07560}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{CE258450-FB71-426F-B695-81D82F9E9E2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE258450-FB71-426F-B695-81D82F9E9E2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE258450-FB71-426F-B695-81D82F9E9E2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8741B2C1-4D6E-4A86-A7E3-6DDE53DBC884}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8741B2C1-4D6E-4A86-A7E3-6DDE53DBC884}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8741B2C1-4D6E-4A86-A7E3-6DDE53DBC884}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8741B2C1-4D6E-4A86-A7E3-6DDE53DBC884}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80D34137-D1C9-4646-8555-A34D88C07560}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80D34137-D1C9-4646-8555-A34D88C07560}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80D34137-D1C9-4646-8555-A34D88C07560}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80D34137-D1C9-4646-8555-A34D88C07560}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
