@@ -9,6 +9,7 @@
         public int StatusPedidoId { get; set; }
         public virtual Usuario Vendedor { get; set; } = null!;
         public virtual StatusPedido StatusPedido { get; set; } = null!;
+        public virtual ICollection<PedidoProduto> PedidoProduto { get; set; }
         public Pedido()
         {
             DataPedido = DateTime.Now;

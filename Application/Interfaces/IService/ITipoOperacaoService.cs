@@ -1,4 +1,5 @@
-﻿using Application.Inputs.TipoOperacaoInput;
+﻿using Application.DTOs;
+using Application.Inputs.TipoOperacaoInput;
 
 namespace Application.Interfaces.IService
 {

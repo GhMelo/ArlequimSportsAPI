@@ -1,9 +1,10 @@
 ﻿using Application.Validations.DataAnnotations;
+using Domain.Entity;
 using System.ComponentModel.DataAnnotations;
 
 namespace Application.Inputs.UsuarioInput
 {
-    internal class UsuarioCadastroInput
+    public class UsuarioCadastroInput
     {
         [Required(ErrorMessage = "Nome é obrigatório.")]
         public required string Nome { get; set; }
@@ -15,5 +16,8 @@ namespace Application.Inputs.UsuarioInput
         [Required(ErrorMessage = "Senha é obrigatória.")]
         [SenhaAttribute(TamanhoMinimo = 8)]
         public required string Senha { get; set; }
+
+        [Required(ErrorMessage = "Tipo é obrigatório.")]
+        public required TipoUsuario Tipo { get; set; }
     }
 }

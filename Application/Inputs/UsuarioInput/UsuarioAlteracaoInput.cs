@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Application.Inputs.UsuarioInput
 {
-    internal class UsuarioAlteracaoInput
+    public class UsuarioAlteracaoInput
     {
 
         [Required(ErrorMessage = "Id é obrigatório.")]

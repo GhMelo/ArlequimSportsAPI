@@ -1,14 +1,14 @@
-﻿using Application.Inputs.UsuarioInput;
+﻿using Application.DTOs;
+using Application.Inputs.UsuarioInput;
 
 namespace Application.Interfaces.IService
 {
     public interface IUsuarioService
     {
-        UsuarioDto ObterUsuarioDtoPorNome(string nome);
+        UsuarioDto ObterUsuarioDtoPorEmail(string email);
         UsuarioDto ObterUsuarioDtoPorId(int id);
         IEnumerable<UsuarioDto> ObterTodosUsuariosDto();
-        void CadastrarUsuarioPadrao(UsuarioCadastroInput UsuarioCadastroInput);
-        void CadastrarUsuarioAdministrador(UsuarioCadastroInput UsuarioCadastroInput);
+        void CadastrarUsuario(UsuarioCadastroInput UsuarioCadastroInput);
         void AlterarUsuario(UsuarioAlteracaoInput UsuarioAlteracaoInput);
         void DeletarUsuario(int id);
     }

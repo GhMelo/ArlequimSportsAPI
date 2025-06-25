@@ -25,6 +25,10 @@ namespace Infrastructure.Repository.Configurations
             builder.HasOne(p => p.StatusPedido)
                 .WithMany()
                 .HasForeignKey(p => p.StatusPedidoId);
+
+            builder.HasMany(p => p.PedidoProduto)
+                .WithOne(pp => pp.Pedido)
+                .HasForeignKey(pp => pp.PedidoId);
         }
     }
 }
