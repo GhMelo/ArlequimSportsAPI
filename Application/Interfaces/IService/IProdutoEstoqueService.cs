@@ -3,7 +3,7 @@ using Application.Inputs.ProdutoEstoqueInput;
 
 namespace Application.Interfaces.IService
 {
-    internal interface IProdutoEstoqueService
+    public interface IProdutoEstoqueService
     {
         IEnumerable<ProdutoEstoqueDto> ObterTodosProdutoEstoqueDto();
         IEnumerable<ProdutoEstoqueDto> ObterTodosProdutoEstoquePorProdutoIdDto(int produtoId);

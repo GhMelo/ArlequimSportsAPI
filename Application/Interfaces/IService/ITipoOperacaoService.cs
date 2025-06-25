@@ -5,10 +5,10 @@ namespace Application.Interfaces.IService
 {
     public interface ITipoOperacaoService
     {
-        IEnumerable<TipoOperacaoDto> ObterTodosTipoOperacaoDto();
-        TipoOperacaoDto ObterTipoOperacaoPorId(int id);
-        void CadastrarTipoOperacao(TipoOperacaoInputCadastro tipoOperacaoCadastroInput);
-        void AlterarTipoOperacao(TipoOperacaoInputAlteracao tipoOperacaoAlteracaoInput);
-        void DeletarTipoOperacao(int id);
+        public IEnumerable<TipoOperacaoDto> ObterTodosTipoOperacaoDto();
+        public TipoOperacaoDto ObterTipoOperacaoPorId(int id);
+        public void CadastrarTipoOperacao(TipoOperacaoInputCadastro tipoOperacaoCadastroInput);
+        public void AlterarTipoOperacao(TipoOperacaoInputAlteracao tipoOperacaoAlteracaoInput);
+        public void DeletarTipoOperacao(int id);
     }
 }

@@ -3,7 +3,7 @@ using Application.Inputs.PedidoInput;
 
 namespace Application.Interfaces.IService
 {
-    internal interface IPedidoService
+    public interface IPedidoService
     {
         IEnumerable<PedidoDto> ObterTodosPedidoDto();
         IEnumerable<PedidoDto> ObterTodosPedidoPorUsuarioIdDto(int usuarioId);
