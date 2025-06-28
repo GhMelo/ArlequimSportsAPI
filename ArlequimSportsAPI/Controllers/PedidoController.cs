@@ -62,7 +62,7 @@ namespace ArlequimSportsAPI.Controllers
         {
             try
             {
-                var emailUsuarioLogado = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var emailUsuarioLogado = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _pedidoService.CadastrarPedido(pedidoCadastroInput, emailUsuarioLogado);
                 return Ok();
             }
@@ -77,7 +77,7 @@ namespace ArlequimSportsAPI.Controllers
         {
             try
             {
-                var emailUsuarioLogado = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var emailUsuarioLogado = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _pedidoService.AlterarPedido(pedidoAlteracaoInput, emailUsuarioLogado);
                 return Ok();
             }
@@ -92,7 +92,7 @@ namespace ArlequimSportsAPI.Controllers
         {
             try
             {
-                var emailUsuarioLogado = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var emailUsuarioLogado = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _pedidoService.DeletarPedido(id, emailUsuarioLogado);
                 return Ok();
             }

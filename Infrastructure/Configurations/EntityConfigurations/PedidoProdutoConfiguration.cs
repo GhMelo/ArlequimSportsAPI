@@ -18,12 +18,13 @@ namespace Infrastructure.Repository.Configurations
             builder.Property(pp => pp.Quantidade).HasColumnType("INT").IsRequired();
 
             builder.HasOne(pp => pp.Pedido)
-                .WithMany()
+                .WithMany(p => p.PedidoProduto)
                 .HasForeignKey(pp => pp.PedidoId);
 
             builder.HasOne(pp => pp.Produto)
                 .WithMany()
-                .HasForeignKey(pp => pp.ProdutoId);
+                .HasForeignKey(pp => pp.ProdutoId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(pp => pp.Produto)
                 .WithMany()

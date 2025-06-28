@@ -47,7 +47,7 @@ namespace Application.Services
         public IEnumerable<EsporteModalidadeDto> ObterTodosEsporteModalidadeDto()
         {
             var esporteModalidade = _esporteModalideRepository.ObterTodos();
-            return new List<EsporteModalidade>().Select(x => new EsporteModalidadeDto()
+            return esporteModalidade.Select(x => new EsporteModalidadeDto()
             {
                 Id = x.Id,
                 Descricao = x.Descricao

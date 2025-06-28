@@ -63,7 +63,7 @@ namespace ArlequimSportsAPI.Controllers
 
         [HttpPut]
         [Authorize(Policy = "Administrador")]
-        public IActionResult Post([FromBody] EsporteModalidadeAlteracaoInput input)
+        public IActionResult Put([FromBody] EsporteModalidadeAlteracaoInput input)
         {
             try
             {

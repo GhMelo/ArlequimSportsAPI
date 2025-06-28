@@ -13,11 +13,9 @@ namespace Application.Services
 {
     public class ProdutoService : IProdutoService
     {
-        private readonly IUsuarioRepository _usuarioRepository;
         private readonly IProdutoRepository _produtoRepository;
-        public ProdutoService(IUsuarioRepository usuarioRepository, IProdutoRepository produtoRepository)
+        public ProdutoService(IProdutoRepository produtoRepository)
         {
-            _usuarioRepository = usuarioRepository;
             _produtoRepository = produtoRepository;
         }
         public void AlterarProduto(ProdutoAlteracaoInput produtoAlteracaoInput)

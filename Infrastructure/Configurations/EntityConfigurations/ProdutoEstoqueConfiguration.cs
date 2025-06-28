@@ -18,7 +18,7 @@ namespace Infrastructure.Repository.Configurations
             builder.Property(pe => pe.DataEntrada).HasColumnType("DATETIME").IsRequired();
 
             builder.HasOne(pe => pe.Produto)
-                .WithMany()
+                .WithMany(p => p.ProdutoEstoque)
                 .HasForeignKey(pe => pe.ProdutoId);
         }
     }

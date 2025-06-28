@@ -4,6 +4,7 @@ using Application.Interfaces.IService;
 using Domain.Entity;
 using Domain.Enums;
 using Domain.Interfaces.IRepository;
+using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
@@ -15,14 +16,14 @@ namespace Application.Services
         private readonly IProdutoEstoqueMovimentacaoRepository _produtoEstoqueMovimentacaoRepository;
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IProdutoRepository _produtoRepository;
-        private readonly DbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public ProdutoEstoqueService(
             IProdutoEstoqueRepository produtoEstoqueRepository,
             IProdutoEstoqueMovimentacaoRepository produtoEstoqueMovimentacaoRepository,
             IUsuarioRepository usuarioRepository,
             IProdutoRepository produtoRepository,
-            DbContext context)
+            ApplicationDbContext context)
         {
             _produtoEstoqueRepository = produtoEstoqueRepository;
             _produtoEstoqueMovimentacaoRepository = produtoEstoqueMovimentacaoRepository;
