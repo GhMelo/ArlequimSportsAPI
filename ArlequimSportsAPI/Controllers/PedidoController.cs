@@ -2,6 +2,7 @@
 using Application.Interfaces.IService;
 using Application.Inputs.PedidoInput;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ArlequimSportsAPI.Controllers
 {
@@ -16,90 +17,53 @@ namespace ArlequimSportsAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Vendedor")]
         public IActionResult Get()
         {
-            try
-            {
                 var pedidos = _pedidoService.ObterTodosPedidoDto();
                 return Ok(pedidos);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Policy = "Vendedor")]
         public IActionResult GetById([FromRoute] int id)
         {
-            try
-            {
                 var pedidos = _pedidoService.ObterPedidoDtoPorId(id);
                 return Ok(pedidos);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpGet("/TodosPedidoPorUsuario/{id:int}")]
+        [Authorize(Policy = "Vendedor")]
         public IActionResult GetPedidosPorUsuario([FromRoute] int id)
         {
-            try
-            {
                 var pedidos = _pedidoService.ObterTodosPedidoPorUsuarioIdDto(id);
                 return Ok(pedidos);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpPost]
+        [Authorize(Policy = "Vendedor")]
         public IActionResult Post([FromBody] PedidoCadastroInput pedidoCadastroInput)
         {
-            try
-            {
                 var emailUsuarioLogado = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _pedidoService.CadastrarPedido(pedidoCadastroInput, emailUsuarioLogado);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpPut]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Put([FromBody] PedidoAlteracaoInput pedidoAlteracaoInput)
         {
-            try
-            {
                 var emailUsuarioLogado = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _pedidoService.AlterarPedido(pedidoAlteracaoInput, emailUsuarioLogado);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
         [HttpDelete("{id:int}")]
-        [HttpDelete]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Delete([FromBody] int id)
         {
-            try
-            {
                 var emailUsuarioLogado = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _pedidoService.DeletarPedido(id, emailUsuarioLogado);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
     }
 }

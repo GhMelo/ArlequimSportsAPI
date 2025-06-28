@@ -1,5 +1,6 @@
 ﻿using Application.Inputs.StatusPedidoInput;
 using Application.Interfaces.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArlequimSportsAPI.Controllers
@@ -14,70 +15,39 @@ namespace ArlequimSportsAPI.Controllers
             _statusPedidoService = statusPedidoService;
         }
         [HttpGet]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Get()
         {
-            try
-            {
                 var statusPedidos = _statusPedidoService.ObterTodosStatusPedidoDto();
                 return Ok(statusPedidos);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
         [HttpGet("{id:int}")]
+        [Authorize(Policy = "Administrador")]
         public IActionResult GetById([FromRoute] int id)
         {
-            try
-            {
                 var statusPedido = _statusPedidoService.ObterStatusPedidoPorId(id);
                 return Ok(statusPedido);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
         [HttpPost]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Post([FromBody] StatusPedidoCadastroInput statusPedido)
         {
-            try
-            {
                 _statusPedidoService.CadastrarStatusPedido(statusPedido);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
         [HttpPut]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Put([FromBody] StatusPedidoAlteracaoInput statusPedido)
         {
-            try
-            {
                 _statusPedidoService.AlterarStatusPedido(statusPedido);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
         [HttpDelete("{id:int}")]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Delete([FromRoute] int id)
         {
-            try
-            {
                 _statusPedidoService.DeletarStatusPedido(id);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
         }
     }
 }

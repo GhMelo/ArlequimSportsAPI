@@ -1,5 +1,6 @@
 ﻿using Application.Inputs.ProdutoEstoqueInput;
 using Application.Interfaces.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -16,92 +17,54 @@ namespace ArlequimSportsAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Vendedor")]
         public IActionResult Get()
         {
-            try
-            {
                 var produtosEstoque = _produtoEstoqueService.ObterTodosProdutoEstoqueDto();
                 return Ok(produtosEstoque);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Policy = "Vendedor")]
         public IActionResult GetById([FromRoute] int id)
         {
-            try
-            {
                 var produtoEstoque = _produtoEstoqueService.ObterProdutoEstoqueDtoPorId(id);
                 return Ok(produtoEstoque);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpGet("/TodosProdutoEstoquePorProduto/{id:int}")]
+        [Authorize(Policy = "Vendedor")]
         public IActionResult GetProdutosEstoquePorProduto([FromRoute] int id)
         {
-            try
-            {
                 var produtosEstoque = _produtoEstoqueService.ObterTodosProdutoEstoquePorProdutoIdDto(id);
                 return Ok(produtosEstoque);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpPost]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Post([FromBody] ProdutoEstoqueCadastroInput input)
         {
-            try
-            {
                 var emailUsuarioLogado = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _produtoEstoqueService.CadastrarProdutoEstoque(input, emailUsuarioLogado);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpPut]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Put([FromBody] ProdutoEstoqueAlteracaoInput input)
         {
-            try
-            {
                 var emailUsuarioLogado = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _produtoEstoqueService.AlterarProdutoEstoque(input, emailUsuarioLogado);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Delete([FromRoute] int id)
         {
-            try
-            {
                 var emailUsuarioLogado = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _produtoEstoqueService.DeletarProdutoEstoque(id, emailUsuarioLogado);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-
         }
     }
 }

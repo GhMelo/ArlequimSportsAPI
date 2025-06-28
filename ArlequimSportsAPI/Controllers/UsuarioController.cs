@@ -1,5 +1,6 @@
 ﻿using Application.Inputs.UsuarioInput;
 using Application.Interfaces.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArlequimSportsAPI.Controllers
@@ -15,34 +16,23 @@ namespace ArlequimSportsAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Get()
         {
-            try
-            {
                 var usuariosDto = _usuarioService.ObterTodosUsuariosDto();
                 return Ok(usuariosDto);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpGet("/UsuarioPorId/{id:int}")]
+        [Authorize(Policy = "Administrador")]
         public IActionResult GetUsuarioPorId([FromRoute] int id)
         {
-            try
-            {
                 var usuarioDto = _usuarioService.ObterUsuarioDtoPorId(id);
                 return Ok(usuarioDto);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpGet("GetUsuarioPorEmail/{email}")]
+        [Authorize(Policy = "Administrador")]
         public IActionResult GetUsuarioPorEmail([FromRoute] string email)
         {
             var usuario = _usuarioService.ObterUsuarioDtoPorEmail(email);
@@ -56,45 +46,25 @@ namespace ArlequimSportsAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] UsuarioCadastroInput usuarioCadastroInput)
         {
-            try
-            {
                 _usuarioService.CadastrarUsuario(usuarioCadastroInput);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpPut]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Put([FromBody] UsuarioAlteracaoInput usuarioAlteracaoInput)
         {
-            try
-            {
                 _usuarioService.AlterarUsuario(usuarioAlteracaoInput);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpDelete]
         [Route("{id:int}")]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Delete([FromRoute] int id)
         {
-            try
-            {
                 _usuarioService.DeletarUsuario(id);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
         }
     }
 }

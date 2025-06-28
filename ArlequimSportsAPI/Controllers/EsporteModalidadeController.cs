@@ -20,75 +20,40 @@ namespace ArlequimSportsAPI.Controllers
         [Authorize(Policy = "Administrador")]
         public IActionResult Get()
         {
-            try
-            {
-                var todosJogosDto = _esporteModalidadeService.ObterTodosEsporteModalidadeDto();
-                return Ok(todosJogosDto);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+                var todosEsporteModalidadeDto = _esporteModalidadeService.ObterTodosEsporteModalidadeDto();
+                return Ok(todosEsporteModalidadeDto);
         }
 
         [HttpGet("{id:int}")]
         [Authorize(Policy = "Administrador")]
         public IActionResult GetById([FromRoute] int id)
         {
-            try
-            {
-                var todosJogosDto = _esporteModalidadeService.ObterEsporteModalidadeDtoPorId(id);
-                return Ok(todosJogosDto);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+                var todosEsporteModalidadeDto = _esporteModalidadeService.ObterEsporteModalidadeDtoPorId(id);
+                return Ok(todosEsporteModalidadeDto);
         }
 
         [HttpPost]
         [Authorize(Policy = "Administrador")]
         public IActionResult Post([FromBody] EsporteModalidadeCadastroInput input)
         {
-            try
-            {
                 _esporteModalidadeService.CadastrarEsporteModalidade(input);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpPut]
         [Authorize(Policy = "Administrador")]
         public IActionResult Put([FromBody] EsporteModalidadeAlteracaoInput input)
         {
-            try
-            {
                 _esporteModalidadeService.AlterarEsporteModalidade(input);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpDelete("{id:int}")]
         [Authorize(Policy = "Administrador")]
         public IActionResult Delete([FromRoute] int id)
         {
-            try
-            {
                 _esporteModalidadeService.DeletarEsporteModalidade(id);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
     }
 }

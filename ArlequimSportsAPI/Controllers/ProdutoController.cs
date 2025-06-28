@@ -18,102 +18,59 @@ namespace ArlequimSportsAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Vendedor")]
         public IActionResult Get()
         {
-            try
-            {
                 var todosProdutoDto = _produtoService.ObterTodosProdutoDto();
                 return Ok(todosProdutoDto);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Policy = "Administrador")]
         public IActionResult GetById([FromRoute] int id)
         {
-            try
-            {
                 var produtoDto = _produtoService.ObterProdutoPorId(id);
                 return Ok(produtoDto);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpGet("/ProdutosPorNome/{nome}")]
+        [Authorize(Policy = "Administrador")]
         public ActionResult GetProdutosPorNome([FromRoute] string nome)
         {
-            try
-            {
                 var produtos = _produtoService.ObterProdutoPorNome(nome);
                 return Ok(produtos);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
         }
 
         [HttpPost]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Post([FromBody] ProdutoCadastroInput produto)
         {
-            try
-            {
                 _produtoService.CadastrarProduto(produto);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpPut]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Put([FromBody] ProdutoAlteracaoInput produto)
         {
-            try
-            {
                 _produtoService.AlterarProduto(produto);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Policy = "Administrador")]
         public IActionResult Delete([FromRoute] int id)
         {
-            try
-            {
                 _produtoService.DeletarProduto(id);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpGet("/ProdutosPorEsporteModalidade/{esporteModalidadeId:int}")]
+        [Authorize(Policy = "Vendedor")]
         public IActionResult GetProdutosPorEsporteModalidade([FromRoute] int esporteModalidadeId)
         {
-            try
-            {
                 var produtos = _produtoService.ObterProdutoPorEsporteModalidade(esporteModalidadeId);
                 return Ok(produtos);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
     }
 }

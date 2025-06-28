@@ -138,7 +138,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<CorrelationIdMiddleware>();
-app.UseMiddleware<DatabaseLoggingMiddleware>();
+app.UseMiddleware<GlobalExceptionAndLoggingMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
