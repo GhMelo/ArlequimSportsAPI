@@ -112,6 +112,8 @@ builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped<IStatusPedidoRepository, StatusPedidoRepository>();
 builder.Services.AddScoped<ITipoOperacaoRepository, TipoOperacaoRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IPedidoProdutoRepository, PedidoProdutoRepository>();
+builder.Services.AddScoped<IProdutoEstoqueMovimentacaoRepository, ProdutoEstoqueMovimentacaoRepository>();
 builder.Services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
