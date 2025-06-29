@@ -1,8 +1,12 @@
+using Application.Interfaces.IProducer;
 using Application.Interfaces.IService;
+using Application.Interfaces.IUnitOfWork;
 using Application.Services;
 using ArlequimSportsAPI.Middlewares;
 using Domain.Interfaces.IRepository;
+using Infrastructure.Configurations.KafkaConfigurations;
 using Infrastructure.Configurations.MongoConfigurations;
+using Infrastructure.Producer;
 using Infrastructure.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -125,6 +129,12 @@ builder.Services.AddScoped<IStatusPedidoService, StatusPedidoService>();
 builder.Services.AddScoped<ITipoOperacaoService, TipoOperacaoService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
+builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+#endregion
+
+#region Configuração do Kafka
+builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection("KafkaSettings"));
+builder.Services.AddScoped<IEmailKafkaProducer, EmailKafkaProducer>();
 #endregion
 
 #region Configuração do Pipeline HTTP

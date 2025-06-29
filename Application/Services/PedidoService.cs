@@ -1,11 +1,12 @@
-﻿using Application.DTOs;
+﻿using System.Net.Mail;
+using Application.DTOs;
 using Application.Inputs.PedidoInput;
+using Application.Interfaces.IProducer;
 using Application.Interfaces.IService;
+using Application.Interfaces.IUnitOfWork;
 using Domain.Entity;
 using Domain.Enums;
 using Domain.Interfaces.IRepository;
-using Infrastructure.Repository;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
@@ -16,20 +17,24 @@ namespace Application.Services
         private readonly IProdutoEstoqueRepository _produtoEstoqueRepository;
         private readonly IProdutoEstoqueMovimentacaoRepository _produtoEstoqueMovimentacaoRepository;
         private readonly IUsuarioRepository _usuarioRepository;
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IEmailKafkaProducer _emailProducer;
+
         public PedidoService(IPedidoRepository pedidoRepository, 
             IPedidoProdutoRepository pedidoProdutoRepository, 
             IProdutoEstoqueRepository produtoEstoqueRepository,
             IProdutoEstoqueMovimentacaoRepository produtoEstoqueMovimentacaoRepository,
             IUsuarioRepository usuarioRepository,
-            ApplicationDbContext dbContext) 
+            IUnitOfWork unitOfWork,
+            IEmailKafkaProducer emailKafkaProducer) 
         {
             _pedidoRepository = pedidoRepository;
             _pedidoProdutoRepository = pedidoProdutoRepository;
             _produtoEstoqueRepository = produtoEstoqueRepository;
             _produtoEstoqueMovimentacaoRepository = produtoEstoqueMovimentacaoRepository;
             _usuarioRepository = usuarioRepository;
-            _context = dbContext;
+            _unitOfWork = unitOfWork;
+            _emailProducer = emailKafkaProducer;
         }
         public void AlterarPedido(PedidoAlteracaoInput pedidoAlteracaoInput, string emailUsuarioLogado)
         {
@@ -125,7 +130,7 @@ namespace Application.Services
         {
             var usuarioLogado = _usuarioRepository.obterPorEmail(emailUsuarioLogado);
 
-            using (var transaction = _context.Database.BeginTransaction())
+            using (var transaction = _unitOfWork.BeginTransactionAsync())
             {
                 try
                 {
@@ -174,12 +179,21 @@ namespace Application.Services
                         }
                     }
 
-                    _context.SaveChanges(); 
-                    transaction.Commit();   
+                    _unitOfWork.CommitAsync();
+
+                    var mensagem = new MensagemEmailDto
+                    {
+                        Para = pedido.EmailCliente,
+                        Assunto = "Pedido Recebido",
+                        Corpo = $"Olá! Recebemos seu pedido nº {pedido.Id}. " +
+                        $"Para confirmar seu pedido clique no link a seguir https://localhost:7261/Pedido/ConfirmarEmailPedido/{pedido.Id}"
+                    };
+
+                    _emailProducer.EnviarMensagemAsync(mensagem);
                 }
                 catch
                 {
-                    transaction.Dispose();
+                    _unitOfWork.DisposeAsync();
                     throw;
                 }
             }

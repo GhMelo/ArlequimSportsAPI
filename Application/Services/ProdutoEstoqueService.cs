@@ -1,10 +1,10 @@
 ﻿using Application.DTOs;
 using Application.Inputs.ProdutoEstoqueInput;
 using Application.Interfaces.IService;
+using Application.Interfaces.IUnitOfWork;
 using Domain.Entity;
 using Domain.Enums;
 using Domain.Interfaces.IRepository;
-using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
@@ -16,27 +16,27 @@ namespace Application.Services
         private readonly IProdutoEstoqueMovimentacaoRepository _produtoEstoqueMovimentacaoRepository;
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IProdutoRepository _produtoRepository;
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ProdutoEstoqueService(
             IProdutoEstoqueRepository produtoEstoqueRepository,
             IProdutoEstoqueMovimentacaoRepository produtoEstoqueMovimentacaoRepository,
             IUsuarioRepository usuarioRepository,
             IProdutoRepository produtoRepository,
-            ApplicationDbContext context)
+            IUnitOfWork unitOfWork)
         {
             _produtoEstoqueRepository = produtoEstoqueRepository;
             _produtoEstoqueMovimentacaoRepository = produtoEstoqueMovimentacaoRepository;
             _usuarioRepository = usuarioRepository;
             _produtoRepository = produtoRepository;
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public void AlterarProdutoEstoque(ProdutoEstoqueAlteracaoInput produtoEstoqueAlteracaoInput, string emailUsuarioLogado)
         {
             var usuarioLogado = _usuarioRepository.obterPorEmail(emailUsuarioLogado);
 
-            using (var transaction = _context.Database.BeginTransaction())
+            using (var transaction = _unitOfWork.BeginTransactionAsync())
             {
                 try
                 {
@@ -104,12 +104,12 @@ namespace Application.Services
                     {
                         throw new Exception("Estoque não encontrado.");
                     }
-                    _context.SaveChanges();
-                    transaction.Commit();
+                    _unitOfWork.SaveChangesAsync();
+                    _unitOfWork.CommitAsync();
                 }
                 catch
                 {
-                    transaction.Dispose();
+                    _unitOfWork.DisposeAsync();
                     throw;
                 }
             }
@@ -118,7 +118,7 @@ namespace Application.Services
         public void CadastrarProdutoEstoque(ProdutoEstoqueCadastroInput produtoEstoqueCadastroInput, string emailUsuarioLogado)
         {
             var usuarioLogado = _usuarioRepository.obterPorEmail(emailUsuarioLogado);
-            using (var transaction = _context.Database.BeginTransaction())
+            using (var transaction = _unitOfWork.BeginTransactionAsync())
             {
                 try
                 {
@@ -149,12 +149,12 @@ namespace Application.Services
                             throw new Exception($"Produto com ID {produto.ProdutoId} não encontrado.");
                         }
                     }
-                    _context.SaveChanges();
-                    transaction.Commit();
+                    _unitOfWork.SaveChangesAsync();
+                    _unitOfWork.CommitAsync();
                 }
                 catch
                 {
-                    transaction.Dispose();
+                    _unitOfWork.DisposeAsync();
                     throw;
                 }
             }
