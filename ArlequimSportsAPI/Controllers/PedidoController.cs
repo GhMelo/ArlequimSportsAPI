@@ -40,6 +40,13 @@ namespace ArlequimSportsAPI.Controllers
                 return Ok(pedidos);
         }
 
+        [HttpGet("/ConfirmarEmailPedido/{id:int}")]
+        public IActionResult GetConfirmarEmailPedido([FromRoute] int id)
+        {
+            var pedidos = _pedidoService.ObterTodosPedidoPorUsuarioIdDto(id);
+            return Ok(pedidos);
+        }
+
         [HttpPost]
         [Authorize(Policy = "Vendedor")]
         public IActionResult Post([FromBody] PedidoCadastroInput pedidoCadastroInput)

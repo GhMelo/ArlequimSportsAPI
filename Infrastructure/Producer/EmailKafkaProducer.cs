@@ -20,7 +20,7 @@ namespace Infrastructure.Producer
         {
             var config = new ProducerConfig
             {
-                BootstrapServers = _settings.ServidorKafka
+                BootstrapServers = _settings.BootstrapServers
             };
 
             using var producer = new ProducerBuilder<Null, string>(config).Build();

@@ -2,10 +2,10 @@
 {
     public interface IUnitOfWork
     {
-        Task BeginTransactionAsync();
-        Task CommitAsync();
-        Task RollbackAsync();
-        Task DisposeAsync();
-        Task SaveChangesAsync();
+        void BeginTransaction();
+        void Commit();
+        void Rollback();
+        void SaveChanges();
+        void Dispose();
     }
 }

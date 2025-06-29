@@ -36,129 +36,130 @@ namespace Application.Services
         {
             var usuarioLogado = _usuarioRepository.obterPorEmail(emailUsuarioLogado);
 
-            using (var transaction = _unitOfWork.BeginTransactionAsync())
+            _unitOfWork.BeginTransaction();
+
+            try
             {
-                try
+                if (_produtoEstoqueRepository.ObterPorId(produtoEstoqueAlteracaoInput.ProdutoEstoqueId) == null)
+                    throw new Exception("Estoque não encontrado.");
+
+                foreach (var produto in produtoEstoqueAlteracaoInput.Produtos)
                 {
-                    if (_produtoEstoqueRepository.ObterPorId(produtoEstoqueAlteracaoInput.ProdutoEstoqueId) != null)
+                    if (_produtoRepository.ObterPorId(produto.ProdutoId) == null)
+                        throw new Exception($"Produto com ID {produto.ProdutoId} não encontrado.");
+
+                    var produtoEstoque = _produtoEstoqueRepository.ObterTodos()
+                        .FirstOrDefault(x =>
+                            x.ProdutoId == produto.ProdutoId &&
+                            x.Id == produtoEstoqueAlteracaoInput.ProdutoEstoqueId);
+
+                    if (produtoEstoque == null)
                     {
-                        foreach (var produto in produtoEstoqueAlteracaoInput.Produtos)
+                        var novoProdutoEstoque = new ProdutoEstoque
                         {
-                            if (_produtoRepository.ObterPorId(produto.ProdutoId) != null)
-                            {
-                                var produtoEstoque = _produtoEstoqueRepository.ObterTodos().FirstOrDefault(x => x.ProdutoId == produto.ProdutoId
-                                && x.Id == produtoEstoqueAlteracaoInput.ProdutoEstoqueId);
+                            ProdutoId = produto.ProdutoId,
+                            Quantidade = produto.Quantidade,
+                            NotaFiscal = produtoEstoqueAlteracaoInput.NotaFiscal,
+                            DataEntrada = produtoEstoqueAlteracaoInput.DataEntrada
+                        };
 
-                                if (produtoEstoque == null)
-                                {
-                                    var novoProdutoEstoque = new ProdutoEstoque
-                                    {
-                                        ProdutoId = produto.ProdutoId,
-                                        Quantidade = produto.Quantidade,
-                                        NotaFiscal = produtoEstoqueAlteracaoInput.NotaFiscal,
-                                        DataEntrada = produtoEstoqueAlteracaoInput.DataEntrada
-                                    };
-                                    _produtoEstoqueRepository.Cadastrar(novoProdutoEstoque);
+                        _produtoEstoqueRepository.Cadastrar(novoProdutoEstoque);
 
-                                    var movimentacao = new ProdutoEstoqueMovimentacao
-                                    {
-                                        ProdutoEstoqueId = novoProdutoEstoque.Id,
-                                        Quantidade = produto.Quantidade,
-                                        DataMovimentacao = DateTime.Now,
-                                        TipoOperacaoId = ((int)ETipoMovimentacao.Entrada),
-                                        IdUsuario = usuarioLogado.Id
-                                    };
-                                    _produtoEstoqueMovimentacaoRepository.Cadastrar(movimentacao);
-                                }
-                                else
-                                {
+                        var movimentacao = new ProdutoEstoqueMovimentacao
+                        {
+                            ProdutoEstoqueId = novoProdutoEstoque.Id,
+                            Quantidade = produto.Quantidade,
+                            DataMovimentacao = DateTime.Now,
+                            TipoOperacaoId = (int)ETipoMovimentacao.Entrada,
+                            IdUsuario = usuarioLogado.Id
+                        };
 
-                                    produtoEstoque.Quantidade += produto.Quantidade;
-                                    if (produtoEstoque.Quantidade < 0)
-                                    {
-                                        throw new Exception($"Quantidade do produto {produto.ProdutoId} não pode ser negativa. Quantidade atual: {produtoEstoque.Quantidade}.");
-                                    }
-                                    produtoEstoque.NotaFiscal = produtoEstoqueAlteracaoInput.NotaFiscal;
-                                    produtoEstoque.DataEntrada = produtoEstoqueAlteracaoInput.DataEntrada;
-                                    _produtoEstoqueRepository.Alterar(produtoEstoque);
-
-
-                                    var movimentacao = new ProdutoEstoqueMovimentacao
-                                    {
-                                        ProdutoEstoqueId = produtoEstoque.Id,
-                                        Quantidade = produtoEstoque.Quantidade,
-                                        DataMovimentacao = DateTime.Now,
-                                        TipoOperacaoId = produtoEstoque.Quantidade > produto.Quantidade ? ((int)ETipoMovimentacao.Saida) : ((int)ETipoMovimentacao.Entrada),
-                                        IdUsuario = usuarioLogado.Id
-                                    };
-                                    _produtoEstoqueMovimentacaoRepository.Cadastrar(movimentacao);
-                                }
-                            }
-                            else
-                            {
-                                throw new Exception($"Produto com ID {produto.ProdutoId} não encontrado.");
-                            }
-                        }
+                        _produtoEstoqueMovimentacaoRepository.Cadastrar(movimentacao);
                     }
                     else
                     {
-                        throw new Exception("Estoque não encontrado.");
+                        var quantidadeAntes = produtoEstoque.Quantidade;
+                        produtoEstoque.Quantidade += produto.Quantidade;
+
+                        if (produtoEstoque.Quantidade < 0)
+                            throw new Exception($"Quantidade do produto {produto.ProdutoId} não pode ser negativa.");
+
+                        produtoEstoque.NotaFiscal = produtoEstoqueAlteracaoInput.NotaFiscal;
+                        produtoEstoque.DataEntrada = produtoEstoqueAlteracaoInput.DataEntrada;
+
+                        _produtoEstoqueRepository.Alterar(produtoEstoque);
+
+                        var tipoMovimentacao = produto.Quantidade < 0
+                            ? (int)ETipoMovimentacao.Saida
+                            : (int)ETipoMovimentacao.Entrada;
+
+                        var movimentacao = new ProdutoEstoqueMovimentacao
+                        {
+                            ProdutoEstoqueId = produtoEstoque.Id,
+                            Quantidade = Math.Abs(produto.Quantidade),
+                            DataMovimentacao = DateTime.Now,
+                            TipoOperacaoId = tipoMovimentacao,
+                            IdUsuario = usuarioLogado.Id
+                        };
+
+                        _produtoEstoqueMovimentacaoRepository.Cadastrar(movimentacao);
                     }
-                    _unitOfWork.SaveChangesAsync();
-                    _unitOfWork.CommitAsync();
                 }
-                catch
-                {
-                    _unitOfWork.DisposeAsync();
-                    throw;
-                }
+
+                _unitOfWork.SaveChanges();
+                _unitOfWork.Commit();
+            }
+            catch
+            {
+                _unitOfWork.Rollback();
+                _unitOfWork.Dispose();
+                throw;
             }
         }
-
         public void CadastrarProdutoEstoque(ProdutoEstoqueCadastroInput produtoEstoqueCadastroInput, string emailUsuarioLogado)
         {
             var usuarioLogado = _usuarioRepository.obterPorEmail(emailUsuarioLogado);
-            using (var transaction = _unitOfWork.BeginTransactionAsync())
-            {
-                try
-                {
-                    foreach (var produto in produtoEstoqueCadastroInput.Produtos)
-                    {
-                        if (_produtoRepository.ObterPorId(produto.ProdutoId) != null)
-                        {
-                            var produtoEstoque = new ProdutoEstoque
-                            {
-                                ProdutoId = produto.ProdutoId,
-                                Quantidade = produto.Quantidade,
-                                NotaFiscal = produtoEstoqueCadastroInput.NotaFiscal,
-                                DataEntrada = DateTime.Now
-                            };
-                            _produtoEstoqueRepository.Cadastrar(produtoEstoque);
-                            var movimentacao = new ProdutoEstoqueMovimentacao
-                            {
-                                ProdutoEstoqueId = produtoEstoque.Id,
-                                Quantidade = produto.Quantidade,
-                                DataMovimentacao = DateTime.Now,
-                                TipoOperacaoId = ((int)ETipoMovimentacao.Entrada),
-                                IdUsuario = usuarioLogado.Id
-                            };
-                            _produtoEstoqueMovimentacaoRepository.Cadastrar(movimentacao);
-                        }
-                        else
-                        {
-                            throw new Exception($"Produto com ID {produto.ProdutoId} não encontrado.");
-                        }
-                    }
-                    _unitOfWork.SaveChangesAsync();
-                    _unitOfWork.CommitAsync();
-                }
-                catch
-                {
-                    _unitOfWork.DisposeAsync();
-                    throw;
-                }
-            }
 
+            _unitOfWork.BeginTransaction();
+
+            try
+            {
+                foreach (var produto in produtoEstoqueCadastroInput.Produtos)
+                {
+                    if (_produtoRepository.ObterPorId(produto.ProdutoId) == null)
+                        throw new Exception($"Produto com ID {produto.ProdutoId} não encontrado.");
+
+                    var produtoEstoque = new ProdutoEstoque
+                    {
+                        ProdutoId = produto.ProdutoId,
+                        Quantidade = produto.Quantidade,
+                        NotaFiscal = produtoEstoqueCadastroInput.NotaFiscal,
+                        DataEntrada = DateTime.Now
+                    };
+
+                    _produtoEstoqueRepository.Cadastrar(produtoEstoque);
+
+                    var movimentacao = new ProdutoEstoqueMovimentacao
+                    {
+                        ProdutoEstoqueId = produtoEstoque.Id,
+                        Quantidade = produto.Quantidade,
+                        DataMovimentacao = DateTime.Now,
+                        TipoOperacaoId = (int)ETipoMovimentacao.Entrada,
+                        IdUsuario = usuarioLogado.Id
+                    };
+
+                    _produtoEstoqueMovimentacaoRepository.Cadastrar(movimentacao);
+                }
+
+                _unitOfWork.SaveChanges();
+                _unitOfWork.Commit();
+            }
+            catch
+            {
+                _unitOfWork.Rollback();
+                _unitOfWork.Dispose();
+                throw;
+            }
         }
 
         public void DeletarProdutoEstoque(int id, string emailUsuarioLogado)

@@ -13,32 +13,30 @@ namespace Infrastructure.Repository
             _context = context;
         }
 
-        public async Task BeginTransactionAsync()
+        public void BeginTransaction()
         {
-            _transaction = await _context.Database.BeginTransactionAsync();
+            _transaction = _context.Database.BeginTransaction();
         }
 
-        public async Task CommitAsync()
+        public void Commit()
         {
-            await _transaction?.CommitAsync();
+            _transaction?.Commit();
         }
 
-        public async Task RollbackAsync()
+        public void Rollback()
         {
-            await _transaction?.RollbackAsync();
-        }
-        public async Task DisposeAsync()
-        {
-            if (_transaction != null)
-            {
-                await _transaction.DisposeAsync();
-            }
-            await _context.DisposeAsync();
+            _transaction?.Rollback();
         }
 
-        public async Task SaveChangesAsync()
+        public void Dispose()
         {
-            await _context.SaveChangesAsync();
+            _transaction?.Dispose();
+            _context.Dispose();
+        }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
         }
     }
 }

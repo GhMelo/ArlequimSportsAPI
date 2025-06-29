@@ -38,64 +38,75 @@ namespace Application.Services
         }
         public void AlterarPedido(PedidoAlteracaoInput pedidoAlteracaoInput, string emailUsuarioLogado)
         {
-            var pedido = _pedidoRepository.ObterPorId(pedidoAlteracaoInput.PedidoId);
-            var usuarioLogado = _usuarioRepository.obterPorEmail(emailUsuarioLogado);
-            pedido.StatusPedidoId = pedidoAlteracaoInput.StatusPedidoId;
-            pedido.DocumentoCliente = pedidoAlteracaoInput.DocumentoCliente;
-            pedido.EmailCliente = pedidoAlteracaoInput.EmailCliente;
-            pedido.VendedorId = pedidoAlteracaoInput.VendedorId;
+            _unitOfWork.BeginTransaction();
 
-            _pedidoRepository.Alterar(pedido);
-
-            var pedidoProdutosDb = _pedidoProdutoRepository.obterTodosPorPedidoId(pedidoAlteracaoInput.PedidoId);
-
-            foreach (var produtoAlteraca in pedidoAlteracaoInput.Produtos)
+            try
             {
-                var pedidoProduto = pedidoProdutosDb.FirstOrDefault(pp => pp.ProdutoId == produtoAlteraca.ProdutoId);
-                if (pedidoProduto != null)
+                var pedido = _pedidoRepository.ObterPorId(pedidoAlteracaoInput.PedidoId);
+                var usuarioLogado = _usuarioRepository.obterPorEmail(emailUsuarioLogado);
+
+                pedido.StatusPedidoId = pedidoAlteracaoInput.StatusPedidoId;
+                pedido.DocumentoCliente = pedidoAlteracaoInput.DocumentoCliente;
+                pedido.EmailCliente = pedidoAlteracaoInput.EmailCliente;
+                pedido.VendedorId = pedidoAlteracaoInput.VendedorId;
+
+                _pedidoRepository.Alterar(pedido);
+
+                var pedidoProdutosDb = _pedidoProdutoRepository.obterTodosPorPedidoId(pedidoAlteracaoInput.PedidoId);
+
+                foreach (var produtoAlteraca in pedidoAlteracaoInput.Produtos)
                 {
-                    if(pedidoProduto.Quantidade != produtoAlteraca.Quantidade)
+                    var pedidoProduto = pedidoProdutosDb.FirstOrDefault(pp => pp.ProdutoId == produtoAlteraca.ProdutoId);
+
+                    if (pedidoProduto != null)
                     {
-                        var produtoEstoque = _produtoEstoqueRepository.ObterPorId(pedidoProduto.ProdutoEstoqueId);
-
-                        var quantidadeDiferenca = produtoAlteraca.Quantidade - pedidoProduto.Quantidade;
-
-                        if (quantidadeDiferenca > 0)
+                        if (pedidoProduto.Quantidade != produtoAlteraca.Quantidade)
                         {
-                            if (produtoEstoque.Quantidade < quantidadeDiferenca)
+                            var produtoEstoque = _produtoEstoqueRepository.ObterPorId(pedidoProduto.ProdutoEstoqueId);
+                            var quantidadeDiferenca = produtoAlteraca.Quantidade - pedidoProduto.Quantidade;
+
+                            if (quantidadeDiferenca > 0)
                             {
-                                throw new Exception("Quantidade insuficiente em estoque para realizar a alteração do pedido.");
+                                if (produtoEstoque.Quantidade < quantidadeDiferenca)
+                                {
+                                    throw new Exception("Quantidade insuficiente em estoque para realizar a alteração do pedido.");
+                                }
+                                produtoEstoque.Quantidade -= quantidadeDiferenca;
                             }
-                            else{
-                                produtoEstoque.Quantidade = produtoEstoque.Quantidade - quantidadeDiferenca;
+                            else
+                            {
+                                produtoEstoque.Quantidade += Math.Abs(quantidadeDiferenca);
                             }
+
+                            var movimentacao = new ProdutoEstoqueMovimentacao
+                            {
+                                ProdutoEstoqueId = produtoEstoque.Id,
+                                Quantidade = Math.Abs(quantidadeDiferenca),
+                                TipoOperacaoId = quantidadeDiferenca > 0
+                                    ? (int)ETipoMovimentacao.Saida
+                                    : (int)ETipoMovimentacao.Entrada,
+                                IdUsuario = usuarioLogado.Id
+                            };
+
+                            _produtoEstoqueRepository.Alterar(produtoEstoque);
+                            _produtoEstoqueMovimentacaoRepository.Cadastrar(movimentacao);
+
+                            pedidoProduto.Quantidade = produtoAlteraca.Quantidade;
+                            _pedidoProdutoRepository.Alterar(pedidoProduto);
                         }
-                        else
-                        {
-                            produtoEstoque.Quantidade = produtoEstoque.Quantidade + Math.Abs(quantidadeDiferenca);
-                        }
-
-                        var movimentacao = new ProdutoEstoqueMovimentacao()
-                        {
-                            ProdutoEstoqueId = produtoEstoque.Id,
-                            Quantidade = Math.Abs(quantidadeDiferenca),
-                            TipoOperacaoId = quantidadeDiferenca > 0 ? ((int)ETipoMovimentacao.Entrada) : ((int)ETipoMovimentacao.Saida),
-                            IdUsuario = usuarioLogado.Id
-                        };
-
-                        _produtoEstoqueMovimentacaoRepository.Cadastrar(movimentacao);
-                        _produtoEstoqueRepository.Alterar(produtoEstoque);
-
-                        pedidoProduto.Quantidade = produtoAlteraca.Quantidade;
-                        _pedidoProdutoRepository.Alterar(pedidoProduto);
                     }
-                }
-                else
-                {
-                    var produtoEstoque = _produtoEstoqueRepository.ObterTodos().Where(p => p.ProdutoId == produtoAlteraca.ProdutoId && p.Quantidade >= produtoAlteraca.Quantidade).FirstOrDefault();
-
-                    if (produtoEstoque != null)
+                    else
                     {
+                        var produtoEstoque = _produtoEstoqueRepository.ObterTodos()
+                            .FirstOrDefault(p =>
+                                p.ProdutoId == produtoAlteraca.ProdutoId &&
+                                p.Quantidade >= produtoAlteraca.Quantidade);
+
+                        if (produtoEstoque == null)
+                        {
+                            throw new Exception("Quantidade insuficiente em estoque para realizar a alteração do pedido.");
+                        }
+
                         var novoPedidoProduto = new PedidoProduto
                         {
                             PedidoId = pedidoAlteracaoInput.PedidoId,
@@ -104,13 +115,13 @@ namespace Application.Services
                             ProdutoEstoqueId = produtoEstoque.Id
                         };
 
-                        produtoEstoque.Quantidade = produtoEstoque.Quantidade - produtoAlteraca.Quantidade;
+                        produtoEstoque.Quantidade -= produtoAlteraca.Quantidade;
 
-                        var movimentacao = new ProdutoEstoqueMovimentacao()
+                        var movimentacao = new ProdutoEstoqueMovimentacao
                         {
                             ProdutoEstoqueId = produtoEstoque.Id,
-                            Quantidade = Math.Abs(produtoAlteraca.Quantidade),
-                            TipoOperacaoId = ((int)ETipoMovimentacao.Saida),
+                            Quantidade = produtoAlteraca.Quantidade,
+                            TipoOperacaoId = (int)ETipoMovimentacao.Saida,
                             IdUsuario = usuarioLogado.Id
                         };
 
@@ -118,85 +129,97 @@ namespace Application.Services
                         _produtoEstoqueMovimentacaoRepository.Cadastrar(movimentacao);
                         _pedidoProdutoRepository.Cadastrar(novoPedidoProduto);
                     }
-                    else
-                    {
-                        throw new Exception("Quantidade insuficiente em estoque para realizar a alteração do pedido.");
-                    }
                 }
+
+                _unitOfWork.SaveChanges();
+                _unitOfWork.Commit();
+            }
+            catch
+            {
+                _unitOfWork.Rollback();
+                _unitOfWork.Dispose();
+                throw;
             }
         }
+
 
         public void CadastrarPedido(PedidoCadastroInput pedidoCadastroInput, string emailUsuarioLogado)
         {
             var usuarioLogado = _usuarioRepository.obterPorEmail(emailUsuarioLogado);
 
-            using (var transaction = _unitOfWork.BeginTransactionAsync())
+            _unitOfWork.BeginTransaction();
+
+            try
             {
-                try
+                var pedido = new Pedido
                 {
-                    var pedido = new Pedido
+                    DocumentoCliente = pedidoCadastroInput.DocumentoCliente,
+                    EmailCliente = pedidoCadastroInput.EmailCliente,
+                    VendedorId = usuarioLogado.Id,
+                    StatusPedidoId = (int)EStatusPedido.AguardandoConfirmacaoEmail
+                };
+
+                _pedidoRepository.Cadastrar(pedido);
+
+                foreach (var produtoCadastro in pedidoCadastroInput.Produtos)
+                {
+                    var produtoEstoque = _produtoEstoqueRepository.ObterTodos()
+                        .FirstOrDefault(p =>
+                            p.ProdutoId == produtoCadastro.ProdutoId &&
+                            p.Quantidade >= produtoCadastro.Quantidade);
+
+                    if (produtoEstoque == null)
+                        throw new Exception("Quantidade insuficiente em estoque para realizar a alteração do pedido.");
+
+                    var novoPedidoProduto = new PedidoProduto
                     {
-                        DocumentoCliente = pedidoCadastroInput.DocumentoCliente,
-                        EmailCliente = pedidoCadastroInput.EmailCliente,
-                        VendedorId = usuarioLogado.Id,
-                        StatusPedidoId = (int)EStatusPedido.Aberto
-                    };
-                    _pedidoRepository.Cadastrar(pedido);
-
-                    foreach (var produtoCadastro in pedidoCadastroInput.Produtos)
-                    {
-                        var produtoEstoque = _produtoEstoqueRepository.ObterTodos()
-                            .Where(p => p.ProdutoId == produtoCadastro.ProdutoId && p.Quantidade >= produtoCadastro.Quantidade)
-                            .FirstOrDefault();
-
-                        if (produtoEstoque != null)
-                        {
-                            var novoPedidoProduto = new PedidoProduto
-                            {
-                                PedidoId = pedido.Id,
-                                ProdutoId = produtoCadastro.ProdutoId,
-                                Quantidade = produtoCadastro.Quantidade,
-                                ProdutoEstoqueId = produtoEstoque.Id
-                            };
-
-                            produtoEstoque.Quantidade = produtoEstoque.Quantidade - produtoCadastro.Quantidade;
-
-                            var movimentacao = new ProdutoEstoqueMovimentacao()
-                            {
-                                ProdutoEstoqueId = produtoEstoque.Id,
-                                Quantidade = Math.Abs(produtoCadastro.Quantidade),
-                                TipoOperacaoId = ((int)ETipoMovimentacao.Saida),
-                                IdUsuario = usuarioLogado.Id
-                            };
-
-                            _produtoEstoqueRepository.Alterar(produtoEstoque);
-                            _produtoEstoqueMovimentacaoRepository.Cadastrar(movimentacao);
-                            _pedidoProdutoRepository.Cadastrar(novoPedidoProduto);
-                        }
-                        else
-                        {
-                            throw new Exception("Quantidade insuficiente em estoque para realizar a alteração do pedido.");
-                        }
-                    }
-
-                    _unitOfWork.CommitAsync();
-
-                    var mensagem = new MensagemEmailDto
-                    {
-                        Para = pedido.EmailCliente,
-                        Assunto = "Pedido Recebido",
-                        Corpo = $"Olá! Recebemos seu pedido nº {pedido.Id}. " +
-                        $"Para confirmar seu pedido clique no link a seguir https://localhost:7261/Pedido/ConfirmarEmailPedido/{pedido.Id}"
+                        PedidoId = pedido.Id,
+                        ProdutoId = produtoCadastro.ProdutoId,
+                        Quantidade = produtoCadastro.Quantidade,
+                        ProdutoEstoqueId = produtoEstoque.Id
                     };
 
-                    _emailProducer.EnviarMensagemAsync(mensagem);
+                    produtoEstoque.Quantidade -= produtoCadastro.Quantidade;
+
+                    var movimentacao = new ProdutoEstoqueMovimentacao
+                    {
+                        ProdutoEstoqueId = produtoEstoque.Id,
+                        Quantidade = Math.Abs(produtoCadastro.Quantidade),
+                        TipoOperacaoId = (int)ETipoMovimentacao.Saida,
+                        IdUsuario = usuarioLogado.Id
+                    };
+
+                    _produtoEstoqueRepository.Alterar(produtoEstoque);
+                    _produtoEstoqueMovimentacaoRepository.Cadastrar(movimentacao);
+                    _pedidoProdutoRepository.Cadastrar(novoPedidoProduto);
                 }
-                catch
+
+                _unitOfWork.SaveChanges();
+                _unitOfWork.Commit();
+
+                var mensagem = new MensagemEmailDto
                 {
-                    _unitOfWork.DisposeAsync();
-                    throw;
-                }
+                    Para = pedido.EmailCliente,
+                    Assunto = "Pedido Recebido",
+                    Corpo = $"Olá! Recebemos seu pedido nº {pedido.Id}. " +
+                            $"Para confirmar seu pedido clique no link a seguir https://localhost:7261/ConfirmarEmailPedido/{pedido.Id}"
+                };
+
+                _emailProducer.EnviarMensagemAsync(mensagem); 
             }
+            catch
+            {
+                _unitOfWork.Rollback();
+                _unitOfWork.Dispose();
+                throw;
+            }
+        }
+
+        public void ConfirmarEmailPedido(int id)
+        {
+            var pedido = _pedidoRepository.ObterPorId(id);
+            pedido.StatusPedidoId = (int)EStatusPedido.EmailConfirmado;
+            _pedidoRepository.Alterar(pedido);
         }
 
         public void DeletarPedido(int id, string emailUsuarioLogado)
