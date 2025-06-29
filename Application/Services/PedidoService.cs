@@ -19,6 +19,7 @@ namespace Application.Services
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IEmailKafkaProducer _emailProducer;
+        private readonly IPagamentoKafkaProducer _pagamentoKafkaProducer;   
 
         public PedidoService(IPedidoRepository pedidoRepository, 
             IPedidoProdutoRepository pedidoProdutoRepository, 
@@ -26,7 +27,8 @@ namespace Application.Services
             IProdutoEstoqueMovimentacaoRepository produtoEstoqueMovimentacaoRepository,
             IUsuarioRepository usuarioRepository,
             IUnitOfWork unitOfWork,
-            IEmailKafkaProducer emailKafkaProducer) 
+            IEmailKafkaProducer emailKafkaProducer,
+            IPagamentoKafkaProducer pagamentoKafkaProducer) 
         {
             _pedidoRepository = pedidoRepository;
             _pedidoProdutoRepository = pedidoProdutoRepository;
@@ -35,6 +37,7 @@ namespace Application.Services
             _usuarioRepository = usuarioRepository;
             _unitOfWork = unitOfWork;
             _emailProducer = emailKafkaProducer;
+            _pagamentoKafkaProducer = pagamentoKafkaProducer;
         }
         public void AlterarPedido(PedidoAlteracaoInput pedidoAlteracaoInput, string emailUsuarioLogado)
         {
@@ -218,8 +221,30 @@ namespace Application.Services
         public void ConfirmarEmailPedido(int id)
         {
             var pedido = _pedidoRepository.ObterPorId(id);
-            pedido.StatusPedidoId = (int)EStatusPedido.EmailConfirmado;
+            pedido.StatusPedidoId = (int)EStatusPedido.AguardandoPagamento;
             _pedidoRepository.Alterar(pedido);
+
+            var mensagemPagamento = new MensagemPagamentoDto
+            {
+                PedidoId = pedido.Id,
+                DocumentoCliente = pedido.DocumentoCliente
+            };
+
+            _pagamentoKafkaProducer.EnviarMensagemAsync(mensagemPagamento);
+        }
+        public void AlterarStatusPagamentoPedido(int statusPagamento, int pedidoId)
+        {
+            var pedido = _pedidoRepository.ObterPorId(pedidoId);
+            if(statusPagamento == 0)
+            {
+                pedido.StatusPedidoId = (int)EStatusPedido.Cancelado;
+                _pedidoRepository.Alterar(pedido);
+            }
+            else
+            {
+                pedido.StatusPedidoId = (int)EStatusPedido.PedidoEmProducao;
+                _pedidoRepository.Alterar(pedido);
+            }
         }
 
         public void DeletarPedido(int id, string emailUsuarioLogado)

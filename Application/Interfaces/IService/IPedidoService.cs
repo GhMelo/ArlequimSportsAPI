@@ -12,5 +12,6 @@ namespace Application.Interfaces.IService
         void ConfirmarEmailPedido(int id);
         void AlterarPedido(PedidoAlteracaoInput pedidoAlteracaoInput, string emailUsuarioLogado);
         void DeletarPedido(int id, string emailUsuarioLogado);
+        void AlterarStatusPagamentoPedido(int statusPagamento, int id);
     }
 }

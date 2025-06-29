@@ -43,8 +43,15 @@ namespace ArlequimSportsAPI.Controllers
         [HttpGet("/ConfirmarEmailPedido/{id:int}")]
         public IActionResult GetConfirmarEmailPedido([FromRoute] int id)
         {
-            var pedidos = _pedidoService.ObterTodosPedidoPorUsuarioIdDto(id);
-            return Ok(pedidos);
+             _pedidoService.ConfirmarEmailPedido(id);
+            return Ok();
+        }
+
+        [HttpGet("/AlterarStatusPagamentoPedido/{statusPagamento:int}/{id:int}")]
+        public IActionResult GetAlterarStatusPagamentoPedido([FromRoute] int statusPagamento, int id)
+        {
+            _pedidoService.AlterarStatusPagamentoPedido(statusPagamento,id);
+            return Ok();
         }
 
         [HttpPost]

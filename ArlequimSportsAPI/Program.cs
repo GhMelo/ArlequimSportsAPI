@@ -135,6 +135,7 @@ builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 #region Configuração do Kafka
 builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection("KafkaSettings"));
 builder.Services.AddScoped<IEmailKafkaProducer, EmailKafkaProducer>();
+builder.Services.AddScoped<IPagamentoKafkaProducer, PagamentoKafkaProducer>();
 #endregion
 
 #region Configuração do Pipeline HTTP
