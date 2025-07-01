@@ -1,4 +1,5 @@
-#ArlequimSportsAPI
+# ArlequimSportsAPI
+
 -O sistema se propõe a ser um gerenciador interno de vendas de artigos de esportes, com controle de estoque, funcionários e pedidos
 -Sistema feito respeitando a divisão de camadas de DDD
 -Utiliza JWT token para autenticação
@@ -8,7 +9,8 @@
 -Utiliza Zookeeper como broker do Kafka
 -Sistema Code First - Utilizando entity framework para fazer o instanciamento o banco e suas entidades
 
-##Instalação
+## Instalação
+
 Para rodar o projeto, clone o projeto
 na pasta SistemaArlequimSports/ArlequimSportsAPI/ArlequimSportsAPI/ entre em appsettings.json  modifique a string de conexão do mongodb para uma propria, pois essa deixei em nuvem em um cluster pessoal
 navegue ate a pasta que tem o docker-compose (SistemaArlequimSports/ArlequimSportsAPI/ArlequimSportsAPI/)
@@ -16,7 +18,8 @@ Digite o comando no powershell docker compose up --build e espere tudo buildar n
 
 Alem de fazer os builds, o sistema também faz o insert de StatusPedido e TipoOperação que são enumerables no Domain da API. Arquivo seed.sql
 
-##Requisições e Testes 
+## Requisições e Testes 
+
 Swagger - http://localhost:5000/swagger/index.html
 
 Post Usuário - O tipo 1 define que é administrador, 0 é vendedor
@@ -101,7 +104,7 @@ Atualmente esse serviço não verifica se o pagamento foi aceito, foi feito para
 
 Get Pedido e la vai estar como a situação que ficou o pedido
 
-##Observações aos analistas:
+## Observações aos analistas:
 
 -Peço que olhem as regras de negocio que implementei baseado em movimento de estoque, qual produto de qual estoque esta sendo feito o pedido, nem todas as entidades tem rotas pois não devem ser modificadas
 -Compreendo que o sistema tem muitas falhas, como a não implementação dos testes(Utilizaria NUnit), não validação de entidades ao ser inserido ao banco, o docker-compose esta na pasta errada, porem tive pouco tempo devido a mudança de cidade
